@@ -25,9 +25,13 @@ def load_tasks():
             return json.load(f)
     return []
 
-def save_tasks(tasks):
-    with open("tasks.json", "w") as f:
-        json.dump(tasks, f, indent=4)
+def load_tasks():
+    try:
+        with open("tasks.json", "r") as f:
+            return json.load(f)
+    except:
+        return []
+
 
 users = load_users()
 tasks = load_tasks()
