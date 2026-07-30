@@ -96,7 +96,7 @@ def register():
     return render_template("register.html")
 
 # -----------------------------
-# Aufgaben
+# Aufgaben – Liste + hinzufügen
 # -----------------------------
 
 @app.route("/tasks", methods=["GET", "POST"])
@@ -106,11 +106,17 @@ def tasks_page():
 
     if request.method == "POST":
         new_task = request.form.get("task")
+        assigned_to = request.form.get("assigned_to")
+
         if new_task:
-            tasks.append({"task": new_task, "done": False})
+            tasks.append({
+                "task": new_task,
+                "done": False,
+                "assigned_to": assigned_to
+            })
             save_tasks(tasks)
 
-    return render_template("tasks.html", tasks=tasks)
+    return render_template("tasks.html", tasks=tasks, users=users)
 
 # -----------------------------
 # Aufgabe erledigt
@@ -121,6 +127,33 @@ def task_done(index):
     tasks[index]["done"] = True
     save_tasks(tasks)
     return redirect("/tasks")
+
+# -----------------------------
+# Aufgabe löschen
+# -----------------------------
+
+@app.route("/task_delete/<int:index>")
+def task_delete(index):
+    tasks.pop(index)
+    save_tasks(tasks)
+    return redirect("/tasks")
+
+# -----------------------------
+# Aufgabe bearbeiten
+# -----------------------------
+
+@app.route("/task_edit/<int:index>", methods=["GET", "POST"])
+def task_edit(index):
+    if "user" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        tasks[index]["task"] = request.form.get("task")
+        tasks[index]["assigned_to"] = request.form.get("assigned_to")
+        save_tasks(tasks)
+        return redirect("/tasks")
+
+    return render_template("task_edit.html", task=tasks[index], index=index, users=users)
 
 # -----------------------------
 # Away-Status
