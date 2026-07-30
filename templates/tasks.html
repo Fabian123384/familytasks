@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Aufgaben</title>
+</head>
+<body>
+    <h1>Aufgabenliste</h1>
+
+    <form method="POST">
+        <input type="text" name="task" placeholder="Neue Aufgabe">
+        <button type="submit">Hinzufügen</button>
+    </form>
+
+    <ul>
+        {% for t in tasks %}
+            <li>
+                {{ t.task }} – {% if t.done %}Erledigt{% else %}
+                <a href="/task_done/{{ loop.index0 }}">Erledigen</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">Zurück</a>
+</body>
+</html>
