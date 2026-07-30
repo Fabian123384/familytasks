@@ -3,25 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>Aufgaben</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            padding: 40px;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; }
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            background: #4a7bd8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+        ul { list-style: none; padding: 0; }
+        li {
+            background: #f7f7f7;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+        a {
+            margin-left: 10px;
+            color: #4a7bd8;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Aufgabenliste</h1>
+    <div class="container">
+        <h1>Aufgaben</h1>
 
-    <form method="POST">
-        <input type="text" name="task" placeholder="Neue Aufgabe">
-        <button type="submit">Hinzufügen</button>
-    </form>
+        <form method="POST">
+            <input type="text" name="task" placeholder="Neue Aufgabe" required>
+            <select name="assigned_to">
+                <option value="">Niemand</option>
+                {% for name, data in users.items() %}
+                    <option value="{{ name }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Hinzufügen</button>
+        </form>
 
-    <ul>
-        {% for t in tasks %}
-            <li>
-                {{ t.task }} – {% if t.done %}Erledigt{% else %}
-                <a href="/task_done/{{ loop.index0 }}">Erledigen</a>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+        <ul>
+            {% for t in tasks %}
+                <li>
+                    <strong>{{ t.task }}</strong><br>
+                    Zuständig: {{ t.assigned_to or "Niemand" }}<br>
 
-    <a href="/">Zurück</a>
+                    {% if t.done %}
+                        ✔️ Erledigt
+                    {% else %}
+                        <a href="/task_done/{{ loop.index0 }}">Erledigen</a>
+                    {% endif %}
+
+                    <a href="/task_edit/{{ loop.index0 }}">Bearbeiten</a>
+                    <a href="/task_delete/{{ loop.index0 }}">Löschen</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <a href="/">Zurück</a>
+    </div>
 </body>
 </html>
