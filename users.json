@@ -1,0 +1,6 @@
+{
+    "Fabian": {"password": "1234", "role": "admin", "away": false},
+    "Mama": {"password": "4321", "role": "user", "away": false},
+    "Papa": {"password": "1357", "role": "user", "away": false},
+    "Laura": {"password": "1111", "role": "user", "away": false}
+}
