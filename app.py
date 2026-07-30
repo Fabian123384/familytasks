@@ -5,25 +5,16 @@ import os
 app = Flask(__name__)
 app.secret_key = "geheim123"
 
-# -----------------------------
-# JSON-Dateien laden & speichern
-# -----------------------------
-
 def load_users():
-    if os.path.exists("users.json"):
+    try:
         with open("users.json", "r") as f:
             return json.load(f)
-    return {}
+    except:
+        return {}
 
 def save_users(users):
     with open("users.json", "w") as f:
         json.dump(users, f, indent=4)
-
-def load_tasks():
-    if os.path.exists("tasks.json"):
-        with open("tasks.json", "r") as f:
-            return json.load(f)
-    return []
 
 def load_tasks():
     try:
@@ -31,6 +22,11 @@ def load_tasks():
             return json.load(f)
     except:
         return []
+
+def save_tasks(tasks):
+    with open("tasks.json", "w") as f:
+        json.dump(tasks, f, indent=4)
+
 
 
 users = load_users()
