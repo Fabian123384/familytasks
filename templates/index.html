@@ -2,79 +2,73 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Familien Aufgaben App</title>
+    <title>FamilyTasks – Startseite</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        a {
+            display: block;
+            padding: 12px;
+            margin: 10px 0;
+            background: #4a7bd8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        a:hover {
+            background: #3a66b8;
+        }
+
+        .logout {
+            background: #d84a4a;
+        }
+
+        .logout:hover {
+            background: #b83a3a;
+        }
+    </style>
 </head>
 <body>
-    <h1>Familien Aufgaben</h1>
+    <div class="container">
+        <h1>Willkommen, {{ user }}!</h1>
 
-    <p>Eingeloggt als: <b>{{ user }}</b> (Rolle: <b>{{ role }}</b>)</p>
+        <p>Was möchtest du tun?</p>
 
-    {% if away %}
-        <p style="color:red;"><b>Status:</b> Du bist NICHT im Haus ❌</p>
-    {% else %}
-        <p style="color:green;"><b>Status:</b> Du bist im Haus ✔️</p>
-    {% endif %}
+        <a href="/tasks">Aufgaben ansehen</a>
+        <a href="/terminal">Admin Terminal</a>
+        <a href="/away">Abwesenheit einstellen</a>
 
-    <form action="/toggle_away" method="post">
-        {% if away %}
-            <button type="submit">Ich bin wieder im Haus</button>
-        {% else %}
-            <button type="submit">Ich bin nicht im Haus</button>
-        {% endif %}
-    </form>
-
-    <form action="/logout" method="post">
-        <button type="submit">Logout</button>
-    </form>
-
-    {% if role == "admin" %}
-        <p><a href="/admin">Benutzerverwaltung</a></p>
-        <p><a href="/terminal">Terminal öffnen (nur Admin)</a></p>
-    {% endif %}
-
-    {% if role in ["admin", "user"] %}
-    <h2>Neue Aufgabe hinzufügen</h2>
-    <form action="/add" method="post">
-        <input type="text" name="task" placeholder="Aufgabe eingeben" required>
-
-        <select name="assigned_to" required>
-            {% for name in users %}
-                <option value="{{ name }}">{{ name }}</option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Hinzufügen</button>
-    </form>
-    {% endif %}
-
-    <h2>Aufgabenliste</h2>
-    <ul>
-        {% for t in tasks %}
-            <li>
-                {% if t.done %}
-                    <s>{{ t.text }}</s> ✔️
-                {% else %}
-                    {{ t.text }}
-                {% endif %}
-
-                <small> → zugewiesen an <b>{{ t.assigned_to }}</b></small>
-
-                {% if (role == "admin" or user == t.assigned_to) and not t.done %}
-                <form action="/done" method="post" style="display:inline;">
-                    <input type="hidden" name="task" value="{{ t.text }}">
-                    <button type="submit">Erledigt</button>
-                </form>
-                {% endif %}
-
-                {% if role == "admin" %}
-                <form action="/delete" method="post" style="display:inline;">
-                    <input type="hidden" name="task" value="{{ t.text }}">
-                    <button type="submit">Löschen</button>
-                </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
+        <a class="logout" href="/logout">Abmelden</a>
+    </div>
 </body>
 </html>
