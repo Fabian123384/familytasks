@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Familien Aufgaben App</title>
+</head>
+<body>
+    <h1>Familien Aufgaben</h1>
+
+    <p>Eingeloggt als: <b>{{ user }}</b> (Rolle: <b>{{ role }}</b>)</p>
+
+    {% if away %}
+        <p style="color:red;"><b>Status:</b> Du bist NICHT im Haus ❌</p>
+    {% else %}
+        <p style="color:green;"><b>Status:</b> Du bist im Haus ✔️</p>
+    {% endif %}
+
+    <form action="/toggle_away" method="post">
+        {% if away %}
+            <button type="submit">Ich bin wieder im Haus</button>
+        {% else %}
+            <button type="submit">Ich bin nicht im Haus</button>
+        {% endif %}
+    </form>
+
+    <form action="/logout" method="post">
+        <button type="submit">Logout</button>
+    </form>
+
+    {% if role == "admin" %}
+        <p><a href="/admin">Benutzerverwaltung</a></p>
+        <p><a href="/terminal">Terminal öffnen (nur Admin)</a></p>
+    {% endif %}
+
+    {% if role in ["admin", "user"] %}
+    <h2>Neue Aufgabe hinzufügen</h2>
+    <form action="/add" method="post">
+        <input type="text" name="task" placeholder="Aufgabe eingeben" required>
+
+        <select name="assigned_to" required>
+            {% for name in users %}
+                <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Hinzufügen</button>
+    </form>
+    {% endif %}
+
+    <h2>Aufgabenliste</h2>
+    <ul>
+        {% for t in tasks %}
+            <li>
+                {% if t.done %}
+                    <s>{{ t.text }}</s> ✔️
+                {% else %}
+                    {{ t.text }}
+                {% endif %}
+
+                <small> → zugewiesen an <b>{{ t.assigned_to }}</b></small>
+
+                {% if (role == "admin" or user == t.assigned_to) and not t.done %}
+                <form action="/done" method="post" style="display:inline;">
+                    <input type="hidden" name="task" value="{{ t.text }}">
+                    <button type="submit">Erledigt</button>
+                </form>
+                {% endif %}
+
+                {% if role == "admin" %}
+                <form action="/delete" method="post" style="display:inline;">
+                    <input type="hidden" name="task" value="{{ t.text }}">
+                    <button type="submit">Löschen</button>
+                </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
