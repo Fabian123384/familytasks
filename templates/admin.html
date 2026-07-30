@@ -62,7 +62,6 @@
         </tr>
         {% endfor %}
     </table>
-
     <h2>Neuen Benutzer hinzufügen</h2>
     <form action="/admin/add_user" method="post">
         <input type="text" name="username" placeholder="Benutzername" required>
@@ -74,6 +73,22 @@
             <option value="kind">kind</option>
         </select>
         <button type="submit">Hinzufügen</button>
+    </form>
+
+    <!-- Passwort ändern -->
+    <h2>Passwort ändern</h2>
+    <form action="/admin/change_password" method="post">
+        <input type="text" name="username" placeholder="Benutzername" required>
+        <input type="password" name="new_password" placeholder="Neues Passwort" required>
+        <button type="submit">Passwort ändern</button>
+    </form>
+
+    <!-- Namen ändern -->
+    <h2>Benutzernamen ändern</h2>
+    <form action="/admin/change_name" method="post">
+        <input type="text" name="old_name" placeholder="Alter Name" required>
+        <input type="text" name="new_name" placeholder="Neuer Name" required>
+        <button type="submit">Name ändern</button>
     </form>
 
 </body>
