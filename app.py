@@ -5,6 +5,10 @@ import os
 app = Flask(__name__)
 app.secret_key = "geheim123"
 
+# -----------------------------
+# JSON-Dateien laden & speichern
+# -----------------------------
+
 def load_users():
     try:
         with open("users.json", "r") as f:
@@ -26,8 +30,6 @@ def load_tasks():
 def save_tasks(tasks):
     with open("tasks.json", "w") as f:
         json.dump(tasks, f, indent=4)
-
-
 
 users = load_users()
 tasks = load_tasks()
@@ -65,7 +67,7 @@ def login():
     return render_template("login.html")
 
 # -----------------------------
-# Logout (GET erlaubt)
+# Logout
 # -----------------------------
 
 @app.route("/logout")
