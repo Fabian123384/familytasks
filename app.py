@@ -111,13 +111,19 @@ def tasks_page():
     if request.method == "POST":
         new_task = request.form.get("task")
         assigned_to = request.form.get("assigned_to")
-        points = int(request.form.get("points"))
+        points_raw = request.form.get("points")
+
+        # Punkte sicher auslesen
+        try:
+            points = int(points_raw)
+        except:
+            points = 0
 
         if new_task:
             tasks.append({
                 "task": new_task,
                 "done": False,
-                "assigned_to": assigned_to,
+                "assigned_to": assigned_to or "",
                 "points": points,
                 "created_by": session["user"]
             })
@@ -125,23 +131,31 @@ def tasks_page():
 
     return render_template("tasks.html", tasks=tasks, users=users)
 
+
 # -----------------------------
 # Aufgabe erledigt
 # -----------------------------
 
 @app.route("/task_done/<int:index>")
 def task_done(index):
+    if index < 0 or index >= len(tasks):
+        return redirect("/tasks")
+
+    # Aufgabe als erledigt markieren
     tasks[index]["done"] = True
 
-    assigned = tasks[index]["assigned_to"]
-    points = tasks[index]["points"]
+    # Sicher auslesen
+    assigned = tasks[index].get("assigned_to", "")
+    points = tasks[index].get("points", 0)
 
+    # Punkte nur vergeben, wenn assigned_to ein gültiger Benutzer ist
     if assigned in users:
-        users[assigned]["points"] += points
+        users[assigned]["points"] = users[assigned].get("points", 0) + points
         save_users(users)
 
     save_tasks(tasks)
     return redirect("/tasks")
+
 
 # -----------------------------
 # Aufgabe löschen
@@ -149,9 +163,11 @@ def task_done(index):
 
 @app.route("/task_delete/<int:index>")
 def task_delete(index):
-    tasks.pop(index)
-    save_tasks(tasks)
+    if 0 <= index < len(tasks):
+        tasks.pop(index)
+        save_tasks(tasks)
     return redirect("/tasks")
+
 
 # -----------------------------
 # Aufgabe bearbeiten
@@ -162,14 +178,25 @@ def task_edit(index):
     if "user" not in session:
         return redirect("/login")
 
+    if index < 0 or index >= len(tasks):
+        return redirect("/tasks")
+
     if request.method == "POST":
         tasks[index]["task"] = request.form.get("task")
-        tasks[index]["assigned_to"] = request.form.get("assigned_to")
-        tasks[index]["points"] = int(request.form.get("points"))
+        tasks[index]["assigned_to"] = request.form.get("assigned_to") or ""
+
+        # Punkte sicher auslesen
+        points_raw = request.form.get("points")
+        try:
+            tasks[index]["points"] = int(points_raw)
+        except:
+            tasks[index]["points"] = 0
+
         save_tasks(tasks)
         return redirect("/tasks")
 
     return render_template("task_edit.html", task=tasks[index], index=index, users=users)
+
 
 # -----------------------------
 # Away-Status
