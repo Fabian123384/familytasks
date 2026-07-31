@@ -1,6 +1,30 @@
 {
-    "Fabian": {"password": "1234", "role": "admin", "away": false},
-    "Mama": {"password": "4321", "role": "user", "away": false},
-    "Papa": {"password": "1357", "role": "user", "away": false},
-    "Laura": {"password": "1111", "role": "user", "away": false}
+    "Fabian": {
+        "password": "1234",
+        "role": "admin",
+        "away": false,
+        "points": 0,
+        "level": 1
+    },
+    "Mama": {
+        "password": "4321",
+        "role": "user",
+        "away": false,
+        "points": 0,
+        "level": 1
+    },
+    "Papa": {
+        "password": "1357",
+        "role": "user",
+        "away": false,
+        "points": 0,
+        "level": 1
+    },
+    "Laura": {
+        "password": "1111",
+        "role": "user",
+        "away": false,
+        "points": 0,
+        "level": 1
+    }
 }
