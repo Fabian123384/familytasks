@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Benutzer hinzufügen</title>
+</head>
+<body>
+    <h1>Benutzer hinzufügen</h1>
+
+    <form method="POST">
+        Name: <input name="name"><br><br>
+        Passwort: <input name="password"><br><br>
+
+        Rolle:
+        <select name="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
+
+        <button type="submit">Speichern</button>
+    </form>
+
+    <br>
+    <a href="/users">Zurück</a>
+</body>
+</html>
