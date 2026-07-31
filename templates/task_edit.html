@@ -46,6 +46,8 @@
         <form method="POST">
             <input type="text" name="task" value="{{ task.task }}" required>
 
+            <input type="number" name="points" value="{{ task.points }}" required>
+
             <select name="assigned_to">
                 <option value="">Niemand</option>
                 {% for name, data in users.items() %}
