@@ -119,6 +119,26 @@ def calculate_level(points):
     else:
         return 7
 
+def level_progress(points):
+    # Level-Grenzen
+    levels = [0, 50, 100, 200, 400, 700, 1000]
+
+    # Aktuelles Level bestimmen
+    level = calculate_level(points)
+
+    # Wenn Level 7 erreicht ist → Fortschritt immer 100%
+    if level >= 7:
+        return 100, levels[level-1], levels[level-1]
+
+    current_min = levels[level-1]
+    next_level = levels[level]
+
+    # Fortschritt berechnen
+    progress = int(((points - current_min) / (next_level - current_min)) * 100)
+
+    return progress, current_min, next_level
+
+
 # -----------------------------
 # Aufgaben – Liste + hinzufügen
 # -----------------------------
