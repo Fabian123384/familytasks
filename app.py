@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, redirect, session
 import json
-import os
 
 app = Flask(__name__)
 app.secret_key = "geheim123"
 
 # -----------------------------
-# JSON-Dateien laden & speichern
+# JSON laden & speichern
 # -----------------------------
 
 def load_users():
@@ -46,7 +45,7 @@ def home():
 
     user = session["user"]
     role = users[user]["role"]
-    return render_template("index.html", user=user, role=role)
+    return render_template("index.html", user=user, role=role, users=users)
 
 # -----------------------------
 # Login
@@ -88,7 +87,12 @@ def register():
         if username in users:
             return render_template("register.html", error="Benutzer existiert bereits")
 
-        users[username] = {"password": password, "role": "user", "away": False}
+        users[username] = {
+            "password": password,
+            "role": "user",
+            "away": False,
+            "points": 0
+        }
         save_users(users)
 
         return redirect("/login")
@@ -107,12 +111,15 @@ def tasks_page():
     if request.method == "POST":
         new_task = request.form.get("task")
         assigned_to = request.form.get("assigned_to")
+        points = int(request.form.get("points"))
 
         if new_task:
             tasks.append({
                 "task": new_task,
                 "done": False,
-                "assigned_to": assigned_to
+                "assigned_to": assigned_to,
+                "points": points,
+                "created_by": session["user"]
             })
             save_tasks(tasks)
 
@@ -125,6 +132,14 @@ def tasks_page():
 @app.route("/task_done/<int:index>")
 def task_done(index):
     tasks[index]["done"] = True
+
+    assigned = tasks[index]["assigned_to"]
+    points = tasks[index]["points"]
+
+    if assigned in users:
+        users[assigned]["points"] += points
+        save_users(users)
+
     save_tasks(tasks)
     return redirect("/tasks")
 
@@ -150,6 +165,7 @@ def task_edit(index):
     if request.method == "POST":
         tasks[index]["task"] = request.form.get("task")
         tasks[index]["assigned_to"] = request.form.get("assigned_to")
+        tasks[index]["points"] = int(request.form.get("points"))
         save_tasks(tasks)
         return redirect("/tasks")
 
