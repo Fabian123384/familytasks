@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Benutzerverwaltung</title>
+</head>
+<body>
+    <h1>Benutzerverwaltung</h1>
+
+    <a href="/user_add">Neuen Benutzer hinzufügen</a>
+    <br><br>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Name</th>
+            <th>Rolle</th>
+            <th>Punkte</th>
+            <th>Level</th>
+            <th>Aktionen</th>
+        </tr>
+
+        {% for name, data in users.items() %}
+        <tr>
+            <td>{{ name }}</td>
+            <td>{{ data.role }}</td>
+            <td>{{ data.points }}</td>
+            <td>{{ data.level }}</td>
+            <td>
+                <a href="/user_edit/{{ name }}">Bearbeiten</a>
+                <a href="/user_delete/{{ name }}">Löschen</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/">Zurück</a>
+</body>
+</html>
