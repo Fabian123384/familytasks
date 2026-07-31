@@ -45,7 +45,20 @@ def home():
 
     user = session["user"]
     role = users[user]["role"]
-    return render_template("index.html", user=user, role=role, users=users)
+
+    points = users[user].get("points", 0)
+    progress, current_min, next_level = level_progress(points)
+
+    return render_template(
+        "index.html",
+        user=user,
+        role=role,
+        users=users,
+        progress=progress,
+        current_min=current_min,
+        next_level=next_level
+    )
+
 
 # -----------------------------
 # Login
