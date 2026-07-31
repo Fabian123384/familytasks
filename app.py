@@ -35,6 +35,39 @@ tasks = load_tasks()
 terminal_output = ["Willkommen im Terminal!"]
 
 # -----------------------------
+# Level berechnen
+# -----------------------------
+
+def calculate_level(points):
+    if points < 50:
+        return 1
+    elif points < 100:
+        return 2
+    elif points < 200:
+        return 3
+    elif points < 400:
+        return 4
+    elif points < 700:
+        return 5
+    elif points < 1000:
+        return 6
+    else:
+        return 7
+
+def level_progress(points):
+    levels = [0, 50, 100, 200, 400, 700, 1000]
+    level = calculate_level(points)
+
+    if level >= 7:
+        return 100, levels[level-1], levels[level-1]
+
+    current_min = levels[level-1]
+    next_level = levels[level]
+
+    progress = int(((points - current_min) / (next_level - current_min)) * 100)
+    return progress, current_min, next_level
+
+# -----------------------------
 # Startseite
 # -----------------------------
 
@@ -58,7 +91,6 @@ def home():
         current_min=current_min,
         next_level=next_level
     )
-
 
 # -----------------------------
 # Login
@@ -104,53 +136,14 @@ def register():
             "password": password,
             "role": "user",
             "away": False,
-            "points": 0
+            "points": 0,
+            "level": 1
         }
         save_users(users)
 
         return redirect("/login")
 
     return render_template("register.html")
-
-# -----------------------------
-# Level berechnen
-# -----------------------------
-
-def calculate_level(points):
-    if points < 50:
-        return 1
-    elif points < 100:
-        return 2
-    elif points < 200:
-        return 3
-    elif points < 400:
-        return 4
-    elif points < 700:
-        return 5
-    elif points < 1000:
-        return 6
-    else:
-        return 7
-
-def level_progress(points):
-    # Level-Grenzen
-    levels = [0, 50, 100, 200, 400, 700, 1000]
-
-    # Aktuelles Level bestimmen
-    level = calculate_level(points)
-
-    # Wenn Level 7 erreicht ist → Fortschritt immer 100%
-    if level >= 7:
-        return 100, levels[level-1], levels[level-1]
-
-    current_min = levels[level-1]
-    next_level = levels[level]
-
-    # Fortschritt berechnen
-    progress = int(((points - current_min) / (next_level - current_min)) * 100)
-
-    return progress, current_min, next_level
-
 
 # -----------------------------
 # Aufgaben – Liste + hinzufügen
@@ -166,7 +159,6 @@ def tasks_page():
         assigned_to = request.form.get("assigned_to")
         points_raw = request.form.get("points")
 
-        # Punkte sicher auslesen
         try:
             points = int(points_raw)
         except:
@@ -184,7 +176,6 @@ def tasks_page():
 
     return render_template("tasks.html", tasks=tasks, users=users)
 
-
 # -----------------------------
 # Aufgabe erledigt
 # -----------------------------
@@ -194,27 +185,18 @@ def task_done(index):
     if index < 0 or index >= len(tasks):
         return redirect("/tasks")
 
-    # Aufgabe als erledigt markieren
     tasks[index]["done"] = True
 
-    # Sicher auslesen
     assigned = tasks[index].get("assigned_to", "")
     points = tasks[index].get("points", 0)
 
-    # Punkte nur vergeben, wenn assigned_to ein gültiger Benutzer ist
     if assigned in users:
-    # Punkte hinzufügen
-    users[assigned]["points"] = users[assigned].get("points", 0) + points
-
-    # Level aktualisieren
-    users[assigned]["level"] = calculate_level(users[assigned]["points"])
-
-    save_users(users)
-
+        users[assigned]["points"] = users[assigned].get("points", 0) + points
+        users[assigned]["level"] = calculate_level(users[assigned]["points"])
+        save_users(users)
 
     save_tasks(tasks)
     return redirect("/tasks")
-
 
 # -----------------------------
 # Aufgabe löschen
@@ -227,36 +209,32 @@ def task_delete(index):
         save_tasks(tasks)
     return redirect("/tasks")
 
-
 # -----------------------------
 # Aufgabe bearbeiten
 # -----------------------------
 
-@app.route("/task_done/<int:index>")
-def task_done(index):
+@app.route("/task_edit/<int:index>", methods=["GET", "POST"])
+def task_edit(index):
+    if "user" not in session:
+        return redirect("/login")
+
     if index < 0 or index >= len(tasks):
         return redirect("/tasks")
 
-    # Aufgabe als erledigt markieren
-    tasks[index]["done"] = True
+    if request.method == "POST":
+        tasks[index]["task"] = request.form.get("task")
+        tasks[index]["assigned_to"] = request.form.get("assigned_to") or ""
 
-    # Sicher auslesen
-    assigned = tasks[index].get("assigned_to", "")
-    points = tasks[index].get("points", 0)
+        points_raw = request.form.get("points")
+        try:
+            tasks[index]["points"] = int(points_raw)
+        except:
+            tasks[index]["points"] = 0
 
-    # Punkte & Level aktualisieren
-    if assigned in users:
-        users[assigned]["points"] = users[assigned].get("points", 0) + points
-        users[assigned]["level"] = calculate_level(users[assigned]["points"])
-        save_users(users)
-
-    save_tasks(tasks)
-    return redirect("/tasks")
-
+        save_tasks(tasks)
+        return redirect("/tasks")
 
     return render_template("task_edit.html", task=tasks[index], index=index, users=users)
-
-
 
 # -----------------------------
 # Away-Status
