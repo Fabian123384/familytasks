@@ -100,6 +100,26 @@ def register():
     return render_template("register.html")
 
 # -----------------------------
+# Level berechnen
+# -----------------------------
+
+def calculate_level(points):
+    if points < 50:
+        return 1
+    elif points < 100:
+        return 2
+    elif points < 200:
+        return 3
+    elif points < 400:
+        return 4
+    elif points < 700:
+        return 5
+    elif points < 1000:
+        return 6
+    else:
+        return 7
+
+# -----------------------------
 # Aufgaben – Liste + hinzufügen
 # -----------------------------
 
