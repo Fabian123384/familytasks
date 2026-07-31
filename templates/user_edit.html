@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Benutzer bearbeiten</title>
+</head>
+<body>
+    <h1>Benutzer bearbeiten: {{ name }}</h1>
+
+    <form method="POST">
+        Passwort: <input name="password" value="{{ user_data.password }}"><br><br>
+
+        Rolle:
+        <select name="role">
+            <option value="user" {% if user_data.role == "user" %}selected{% endif %}>User</option>
+            <option value="admin" {% if user_data.role == "admin" %}selected{% endif %}>Admin</option>
+        </select><br><br>
+
+        Away:
+        <select name="away">
+            <option value="false" {% if not user_data.away %}selected{% endif %}>Nein</option>
+            <option value="true" {% if user_data.away %}selected{% endif %}>Ja</option>
+        </select><br><br>
+
+        Punkte: <input name="points" value="{{ user_data.points }}"><br><br>
+
+        <button type="submit">Speichern</button>
+    </form>
+
+    <br>
+    <a href="/users">Zurück</a>
+</body>
+</html>
