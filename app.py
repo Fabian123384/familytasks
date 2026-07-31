@@ -232,27 +232,27 @@ def task_delete(index):
 # Aufgabe bearbeiten
 # -----------------------------
 
-@app.route("/task_edit/<int:index>", methods=["GET", "POST"])
-def task_edit(index):
-    if "user" not in session:
-        return redirect("/login")
-
+@app.route("/task_done/<int:index>")
+def task_done(index):
     if index < 0 or index >= len(tasks):
         return redirect("/tasks")
 
-    if request.method == "POST":
-        tasks[index]["task"] = request.form.get("task")
-        tasks[index]["assigned_to"] = request.form.get("assigned_to") or ""
+    # Aufgabe als erledigt markieren
+    tasks[index]["done"] = True
 
-        # Punkte sicher auslesen
-        points_raw = request.form.get("points")
-        try:
-            tasks[index]["points"] = int(points_raw)
-        except:
-            tasks[index]["points"] = 0
+    # Sicher auslesen
+    assigned = tasks[index].get("assigned_to", "")
+    points = tasks[index].get("points", 0)
 
-        save_tasks(tasks)
-        return redirect("/tasks")
+    # Punkte & Level aktualisieren
+    if assigned in users:
+        users[assigned]["points"] = users[assigned].get("points", 0) + points
+        users[assigned]["level"] = calculate_level(users[assigned]["points"])
+        save_users(users)
+
+    save_tasks(tasks)
+    return redirect("/tasks")
+
 
     return render_template("task_edit.html", task=tasks[index], index=index, users=users)
 
