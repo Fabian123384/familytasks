@@ -203,8 +203,14 @@ def task_done(index):
 
     # Punkte nur vergeben, wenn assigned_to ein gültiger Benutzer ist
     if assigned in users:
-        users[assigned]["points"] = users[assigned].get("points", 0) + points
-        save_users(users)
+    # Punkte hinzufügen
+    users[assigned]["points"] = users[assigned].get("points", 0) + points
+
+    # Level aktualisieren
+    users[assigned]["level"] = calculate_level(users[assigned]["points"])
+
+    save_users(users)
+
 
     save_tasks(tasks)
     return redirect("/tasks")
