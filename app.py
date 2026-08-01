@@ -190,10 +190,15 @@ def task_done(index):
     assigned = tasks[index].get("assigned_to", "")
     points = tasks[index].get("points", 0)
 
-    if assigned in users:
-        users[assigned]["points"] = users[assigned].get("points", 0) + points
-        users[assigned]["level"] = calculate_level(users[assigned]["points"])
-        save_users(users)
+    # Nur der zugewiesene Benutzer darf erledigen
+if assigned != session["user"]:
+    return redirect("/tasks")
+
+# Punkte & Level aktualisieren
+users[assigned]["points"] = users[assigned].get("points", 0) + points
+users[assigned]["level"] = calculate_level(users[assigned]["points"])
+save_users(users)
+
 
     save_tasks(tasks)
     return redirect("/tasks")
