@@ -154,6 +154,8 @@ def tasks_page():
     if "user" not in session:
         return redirect("/login")
 
+    current_user = session["user"]
+
     if request.method == "POST":
         new_task = request.form.get("task")
         assigned_to = request.form.get("assigned_to")
@@ -170,11 +172,11 @@ def tasks_page():
                 "done": False,
                 "assigned_to": assigned_to or "",
                 "points": points,
-                "created_by": session["user"]
+                "created_by": current_user
             })
             save_tasks(tasks)
 
-    return render_template("tasks.html", tasks=tasks, users=users)
+    return render_template("tasks.html", tasks=tasks, users=users, user=current_user)
 
 # -----------------------------
 # Aufgabe erledigt
@@ -182,23 +184,27 @@ def tasks_page():
 
 @app.route("/task_done/<int:index>")
 def task_done(index):
+    if "user" not in session:
+        return redirect("/login")
+
     if index < 0 or index >= len(tasks):
         return redirect("/tasks")
 
-    tasks[index]["done"] = True
+    current_user = session["user"]
 
     assigned = tasks[index].get("assigned_to", "")
     points = tasks[index].get("points", 0)
 
     # Nur der zugewiesene Benutzer darf erledigen
-if assigned != session["user"]:
-    return redirect("/tasks")
+    if assigned != current_user:
+        return redirect("/tasks")
 
-# Punkte & Level aktualisieren
-users[assigned]["points"] = users[assigned].get("points", 0) + points
-users[assigned]["level"] = calculate_level(users[assigned]["points"])
-save_users(users)
+    tasks[index]["done"] = True
 
+    if assigned in users:
+        users[assigned]["points"] = users[assigned].get("points", 0) + points
+        users[assigned]["level"] = calculate_level(users[assigned]["points"])
+        save_users(users)
 
     save_tasks(tasks)
     return redirect("/tasks")
@@ -209,6 +215,9 @@ save_users(users)
 
 @app.route("/task_delete/<int:index>")
 def task_delete(index):
+    if "user" not in session:
+        return redirect("/login")
+
     if 0 <= index < len(tasks):
         tasks.pop(index)
         save_tasks(tasks)
