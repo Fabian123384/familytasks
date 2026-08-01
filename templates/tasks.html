@@ -2,88 +2,170 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Aufgaben</title>
+    <title>FamilyTasks – Aufgaben</title>
+
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #f0f2f5;
-            padding: 40px;
+            margin: 0;
+            padding: 20px;
         }
+
         .container {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            width: 500px;
+            max-width: 700px;
             margin: auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
-        h1 { text-align: center; }
-        form input, form select {
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .task {
+            background: #f8f9fc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 6px solid #4a7bd8;
+        }
+
+        .task.done {
+            background: #e6ffe6;
+            border-left-color: #4ad86a;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task p {
+            margin: 5px 0;
+            color: #444;
+        }
+
+        .buttons {
+            margin-top: 10px;
+        }
+
+        .buttons a {
+            padding: 8px 12px;
+            background: #4a7bd8;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .buttons a:hover {
+            background: #3a66b8;
+        }
+
+        .delete {
+            background: #d84a4a !important;
+        }
+
+        .delete:hover {
+            background: #b83a3a !important;
+        }
+
+        .done {
+            background: #4ad86a !important;
+        }
+
+        .done:hover {
+            background: #3bb85a !important;
+        }
+
+        form {
+            margin-top: 30px;
+            background: #f8f9fc;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input, select {
             width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
         }
+
         button {
-            padding: 10px;
             width: 100%;
+            padding: 12px;
             background: #4a7bd8;
             color: white;
             border: none;
             border-radius: 8px;
+            font-size: 16px;
         }
-        ul { list-style: none; padding: 0; }
-        li {
-            background: #f7f7f7;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
+
+        button:hover {
+            background: #3a66b8;
         }
-        a {
-            margin-left: 10px;
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
             color: #4a7bd8;
             text-decoration: none;
         }
+
+        .back:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Aufgaben</h1>
 
+        {% for task in tasks %}
+        <div class="task {% if task.done %}done{% endif %}">
+            <p><strong>{{ task.task }}</strong></p>
+            <p>Zugewiesen an: {{ task.assigned_to or "Niemand" }}</p>
+            <p>Punkte: {{ task.points }}</p>
+
+            <div class="buttons">
+                {% if not task.done %}
+                <a class="done" href="/task_done/{{ loop.index0 }}">Erledigt</a>
+                {% endif %}
+                <a href="/task_edit/{{ loop.index0 }}">Bearbeiten</a>
+                <a class="delete" href="/task_delete/{{ loop.index0 }}">Löschen</a>
+            </div>
+        </div>
+        {% endfor %}
+
         <form method="POST">
-            <input type="text" name="task" placeholder="Neue Aufgabe" required>
+            <h2>Neue Aufgabe hinzufügen</h2>
 
-            <input type="number" name="points" placeholder="Punkte" required>
+            <label>Aufgabe:</label>
+            <input name="task" required>
 
+            <label>Zuweisen an:</label>
             <select name="assigned_to">
                 <option value="">Niemand</option>
-                {% for name, data in users.items() %}
-                    <option value="{{ name }}">{{ name }}</option>
+                {% for name in users %}
+                <option value="{{ name }}">{{ name }}</option>
                 {% endfor %}
             </select>
 
-            <button type="submit">Hinzufügen</button>
+            <label>Punkte:</label>
+            <input name="points" type="number" min="0" value="0">
+
+            <button type="submit">Aufgabe erstellen</button>
         </form>
 
-        <ul>
-            {% for t in tasks %}
-                <li>
-                    <strong>{{ t.task }}</strong><br>
-                    Punkte: {{ t.points }}<br>
-                    Zuständig: {{ t.assigned_to or "Niemand" }}<br>
-
-                    {% if t.done %}
-                        ✔️ Erledigt
-                    {% else %}
-                        <a href="/task_done/{{ loop.index0 }}">Erledigen</a>
-                    {% endif %}
-
-                    <a href="/task_edit/{{ loop.index0 }}">Bearbeiten</a>
-                    <a href="/task_delete/{{ loop.index0 }}">Löschen</a>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <a href="/">Zurück</a>
+        <a class="back" href="/">Zurück zur Startseite</a>
     </div>
 </body>
 </html>
