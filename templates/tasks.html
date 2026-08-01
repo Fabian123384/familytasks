@@ -136,9 +136,10 @@
             <p>Punkte: {{ task.points }}</p>
 
             <div class="buttons">
-                {% if not task.done %}
+                {% if not task.done and task.assigned_to == user %}
                 <a class="done" href="/task_done/{{ loop.index0 }}">Erledigt</a>
                 {% endif %}
+
                 <a href="/task_edit/{{ loop.index0 }}">Bearbeiten</a>
                 <a class="delete" href="/task_delete/{{ loop.index0 }}">Löschen</a>
             </div>
